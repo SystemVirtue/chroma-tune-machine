@@ -252,7 +252,7 @@ export const usePlayerManager = (
       // Check for available displays and prefer secondary display with timeout
       console.log("[InitPlayer] Detecting available displays...");
       const displayPromise = displayManager.getDisplays();
-      const timeoutPromise = new Promise((_, reject) =>
+      const timeoutPromise = new Promise<DisplayInfo[]>((_, reject) =>
         setTimeout(() => reject(new Error("Display detection timeout")), 3000),
       );
 
@@ -263,7 +263,7 @@ export const usePlayerManager = (
       let useFullscreen = false;
 
       // Prefer secondary display if available
-      const secondaryDisplay = displays.find((display) => !display.isPrimary);
+      const secondaryDisplay = displays.find((display: DisplayInfo) => !display.isPrimary);
       if (secondaryDisplay) {
         console.log(
           "[InitPlayer] Secondary display found, using it:",
@@ -273,7 +273,7 @@ export const usePlayerManager = (
         useFullscreen = true; // Default to fullscreen on secondary display
       } else {
         console.log("[InitPlayer] No secondary display found, using primary");
-        targetDisplay = displays.find((d) => d.isPrimary) || displays[0];
+        targetDisplay = displays.find((d: DisplayInfo) => d.isPrimary) || displays[0];
         useFullscreen = false; // Windowed mode on primary display
       }
 
