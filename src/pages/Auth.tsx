@@ -41,7 +41,7 @@ const Auth = () => {
         title: "Welcome back!",
         description: "Authentication bypassed for testing.",
       });
-      navigate(from, { replace: true });
+      navigate('/admin', { replace: true });
       setLoading(false);
     }, 500);
   };
