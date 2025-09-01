@@ -2,17 +2,10 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/hooks/useAuth';
-import { Music, LogOut, Settings, Play } from 'lucide-react';
+import { Music, Settings, Play } from 'lucide-react';
 
 const Home = () => {
-  const { user, signOut } = useAuth();
   const navigate = useNavigate();
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/auth');
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
@@ -28,11 +21,7 @@ const Home = () => {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">Welcome, {user?.email}</span>
-            <Button variant="ghost" size="sm" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
+            <span className="text-sm text-muted-foreground">System Ready</span>
           </div>
         </div>
       </header>

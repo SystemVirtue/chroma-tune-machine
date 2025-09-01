@@ -10,11 +10,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import { 
   Home, 
-  LogOut, 
   Play, 
   Pause, 
   SkipForward, 
@@ -49,7 +46,6 @@ interface ApprovedUser {
 }
 
 const Admin = () => {
-  const { user, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -68,158 +64,24 @@ const Admin = () => {
   ]);
   const [approvedUsers, setApprovedUsers] = useState<ApprovedUser[]>([]);
   const [newUserEmail, setNewUserEmail] = useState('');
-  const [userRole, setUserRole] = useState<string>('');
-  const [loading, setLoading] = useState(true);
+  const [userRole, setUserRole] = useState<string>('super_admin');
 
-  // Check if user has admin permissions
-  useEffect(() => {
-    checkAdminAccess();
-    loadApprovedUsers();
-    loadUserProfile();
-  }, [user]);
-
-  const checkAdminAccess = async () => {
-    if (!user) {
-      navigate('/auth');
-      return;
-    }
-
-    try {
-      const { data: profile, error } = await supabase
-        .from('user_profiles')
-        .select('role')
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        toast({
-          title: "Access Denied",
-          description: "Unable to verify admin permissions.",
-          variant: "destructive"
-        });
-        navigate('/');
-        return;
-      }
-
-      if (!profile || (profile.role !== 'super_admin' && profile.role !== 'tenant_admin')) {
-        toast({
-          title: "Access Denied",
-          description: "You don't have permission to access the admin console.",
-          variant: "destructive"
-        });
-        navigate('/');
-        return;
-      }
-
-      setUserRole(profile.role);
-    } catch (error) {
-      console.error('Error checking admin access:', error);
-      navigate('/');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadUserProfile = async () => {
-    if (!user) return;
-
-    try {
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('role')
-        .eq('user_id', user.id)
-        .single();
-
-      if (profile) {
-        setUserRole(profile.role);
-      }
-    } catch (error) {
-      console.error('Error loading user profile:', error);
-    }
-  };
-
-  const loadApprovedUsers = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('approved_users')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error loading approved users:', error);
-        return;
-      }
-
-      setApprovedUsers(data || []);
-    } catch (error) {
-      console.error('Error loading approved users:', error);
-    }
-  };
-
-  const addApprovedUser = async () => {
+  const addApprovedUser = () => {
     if (!newUserEmail.trim()) return;
-
-    try {
-      const { error } = await supabase
-        .from('approved_users')
-        .insert({
-          email: newUserEmail.toLowerCase(),
-          status: 'approved',
-          approved_by: user?.id,
-          approved_at: new Date().toISOString()
-        });
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to add user. Email might already exist.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      toast({
-        title: "User Added",
-        description: `${newUserEmail} has been approved for access.`,
-      });
-
-      setNewUserEmail('');
-      loadApprovedUsers();
-    } catch (error) {
-      console.error('Error adding approved user:', error);
-    }
+    
+    toast({
+      title: "User Added (Demo)",
+      description: `${newUserEmail} would be approved for access.`,
+    });
+    
+    setNewUserEmail('');
   };
 
-  const updateUserStatus = async (userId: string, status: 'approved' | 'rejected') => {
-    try {
-      const { error } = await supabase
-        .from('approved_users')
-        .update({
-          status,
-          approved_by: user?.id,
-          approved_at: new Date().toISOString()
-        })
-        .eq('id', userId);
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to update user status.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      toast({
-        title: "Status Updated",
-        description: `User has been ${status}.`,
-      });
-
-      loadApprovedUsers();
-    } catch (error) {
-      console.error('Error updating user status:', error);
-    }
+  const updateUserStatus = (userId: string, status: 'approved' | 'rejected') => {
+    toast({
+      title: "Status Updated (Demo)",
+      description: `User would be ${status}.`,
+    });
   };
 
   const addLog = (type: LogEntry['type'], description: string, videoId?: string, creditAmount?: number) => {
@@ -293,16 +155,6 @@ const Admin = () => {
     });
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p>Loading admin console...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -318,15 +170,11 @@ const Admin = () => {
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">
-              {user?.email} ({userRole === 'super_admin' ? 'Super Admin' : 'Admin'})
+              Admin ({userRole === 'super_admin' ? 'Super Admin' : 'Admin'})
             </span>
             <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
               <Home className="h-4 w-4 mr-2" />
               Home
-            </Button>
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
             </Button>
           </div>
         </div>

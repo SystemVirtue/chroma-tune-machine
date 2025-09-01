@@ -4,7 +4,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Card, CardContent } from "@/components/ui/card";
 import { Check, X, Home, LogOut } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { SearchInterface } from "@/components/SearchInterface";
 import { useBackgroundManager, BackgroundDisplay } from "@/components/BackgroundManager";
@@ -68,7 +67,6 @@ const DEFAULT_PLAYLIST_ID = 'PLN9QqCogPsXJCgeL_iEgYnW6Rl_8nIUUH';
 
 const Jukebox = () => {
   const { toast } = useToast();
-  const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   const [state, setState] = useState<JukeboxState>({
@@ -308,14 +306,9 @@ const Jukebox = () => {
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-white">Music Jukebox</h1>
             <div className="flex items-center gap-2">
-              <span className="text-white/80 text-sm">Welcome, {user?.email}</span>
               <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
                 <Home className="h-4 w-4 mr-2" />
                 Home
-              </Button>
-              <Button variant="ghost" size="sm" onClick={signOut}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
               </Button>
             </div>
           </div>
