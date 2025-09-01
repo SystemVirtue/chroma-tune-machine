@@ -11,8 +11,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Music } from 'lucide-react';
 
 const Auth = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('disabled_for_testing@email.com');
+  const [password, setPassword] = useState('password');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -35,26 +35,15 @@ const Auth = () => {
     setLoading(true);
     setError('');
 
-    try {
-      const { error } = await signIn(email, password);
-      
-      if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          setError('Invalid email or password. Please try again.');
-        } else {
-          setError(error.message);
-        }
-      } else {
-        toast({
-          title: "Welcome back!",
-          description: "You have successfully signed in.",
-        });
-      }
-    } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
-    } finally {
+    // Simulate loading for testing purposes
+    setTimeout(() => {
+      toast({
+        title: "Welcome back!",
+        description: "Authentication bypassed for testing.",
+      });
+      navigate(from, { replace: true });
       setLoading(false);
-    }
+    }, 500);
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -97,6 +86,9 @@ const Auth = () => {
           <CardDescription>
             Access your music jukebox system
           </CardDescription>
+          <p className="text-sm text-muted-foreground mt-2 font-medium">
+            NOTE - Login is simulated for testing purposes - click SIGN IN to proceed
+          </p>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
